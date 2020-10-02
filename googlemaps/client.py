@@ -50,8 +50,8 @@ class Client(object):
     """Performs requests to the Google Maps API web services."""
 
     def __init__(self, key=None, client_id=None, client_secret=None,
-                 timeout=None, connect_timeout=None, read_timeout=None,
-                 retry_timeout=60, requests_kwargs=None,
+                 session=None, timeout=None, connect_timeout=None,
+                 read_timeout=None, retry_timeout=60, requests_kwargs=None,
                  queries_per_second=50, channel=None,
                  retry_over_query_limit=True, experience_id=None, 
                  base_url=_DEFAULT_BASE_URL):
@@ -73,6 +73,11 @@ class Client(object):
             This can be used for tracking purpose.
             Can only be used with a Maps API client ID.
         :type channel: str
+
+        :param session: The session to use when making HTTP requests.  This
+            provides finer-grained control over the Client's HTTP retries.
+            Default is "None", allowing the Client to create its own session.
+        :type session: requests.Session
 
         :param timeout: Combined connect and read timeout for HTTP requests, in
             seconds. Specify "None" for no timeout.
@@ -138,7 +143,7 @@ class Client(object):
                     "alphanumeric string. The period (.), underscore (_)"
                     "and hyphen (-) characters are allowed.")
 
-        self.session = requests.Session()
+        self.session = session or requests.Session()
         self.key = key
 
         if timeout and (connect_timeout or read_timeout):
